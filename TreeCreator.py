@@ -49,11 +49,13 @@ import time
 spParams =np.logspace(-1,-10)
 diffTParam = np.linspace(.5,2.5)
 toRet = []
+i = 0
 
 for sp in spParams:
     for dtP in diffTParam:
+        i+=1
         t0 = time.time()
-        print(dtP, sp)
+        print(dtP, sp, i)
         st = simTree(2000, 1000, split = sp, diffThresh= dtP)
         toRet.append((sp, dtP, [len(e) for e in st]))
         print((time.time()-t0)/60)
