@@ -45,16 +45,18 @@ def simTree(generaNum, generations, split = .001, diffDist = np.random.normal, d
     return genera
 
 import pickle
-
+import time
 spParams =np.logspace(-1,-10)
 diffTParam = np.linspace(.5,2.5)
 toRet = []
 
 for sp in spParams:
     for dtP in diffTParam:
+        t0 = time.time()
         print(dtP, sp)
         st = simTree(2000, 1000, split = sp, diffThresh= dtP)
         toRet.append((sp, dtP, [len(e) for e in st]))
+        print((time.time()-t0)/60)
 
 with open('toRet.pickle','wb') as f:
     pickle.dump(toRet,f, protocol = 0)
