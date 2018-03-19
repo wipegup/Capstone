@@ -60,5 +60,5 @@ for sp in spParams:
         toRet.append((sp, dtP, [len(e) for e in st]))
         print((time.time()-t0)/60)
 
-with open('toRet.pickle','wb') as f:
+with open('toRet2.pickle','wb') as f:
     pickle.dump(toRet,f, protocol = 0)
