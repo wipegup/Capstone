@@ -45,7 +45,7 @@ def searcher(targetDict, X, paramDict):
             scores = crossVal(DecisionTreeRegressor(**argDict),
                     X,
                     targetDict[targetName],
-                    3)
+                    100)
 
             t1 = time.time()
             name = dict({'name':str(DecisionTreeRegressor).split('.')[-1][:-2]},
