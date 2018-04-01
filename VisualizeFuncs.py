@@ -84,10 +84,51 @@ def alphaRank(data):
     return pd.concat(dfCollector, axis = 'rows')
 
 #####
+def speciesGrouper(data, gbList, gbListNames):
+    split = pd.DataFrame(data.groupby(gbList)['Species'].count())
+    for idx in split.index:
+        for i, n in enumerate(gbListNames):
+            split.loc[idx,n] = idx[i]
+    split.index = range(len(split))
+    return split
+
+def fullTableMaker(data):
+    tables = {}
+    info = ['Species','SpG','Rank','DateRank']
+    data = data.astype(int)
+    sp, spg, rank, dRank = 0,0,0,0
+    for row in data.iterrows():
+
+        sp = row[1]['Species']
+        spg = row[1]['SpG']
+        rank = row[1]['Rank']
+        dRank = row[1]['DateRank']
+
+        if spg not in tables.keys():
+            tables[spg] = {}
+        if rank not in tables[spg].keys():
+            tables[spg][rank] = [0] * spg
+        if tables[spg][rank][dRank-1] == 0:
+            tables[spg][rank][dRank-1] = sp
+        else:
+            print('error', spg, rank, dRank)
+    return tables
+
+def epochSplitter(data, splitter, epochs):
+    grouped = speciesGrouper(data,
+                             [pd.cut(data[splitter], epochs), 'SpG', 'Rank','DateRank'],
+                             ['age', 'SpG', 'Rank','DateRank'] )
+    ages = list(grouped['age'].unique())
+    toRet = {}
+    for a in ages:
+        toRet[a] = fullTableMaker(grouped[grouped['age'] == a].drop('age', axis = 'columns'))
+    return toRet
+
+#####
 # Given data frame with 'SpG','Rank', and 'DateRank'
 # returns tables that give number of species that have particular
 # combination of 'SpG', 'Rank', and 'DateRank'
-#####
+#####DEPRECATED
 def makeSpeciesRankDateTables(data):
 
     data = pd.DataFrame(data.groupby(['SpG','Rank', 'DateRank',])['Species'].count())

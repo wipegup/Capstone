@@ -1,17 +1,26 @@
+#####
+# Script used to find best fitting Decision Tree
+#####
+
+## Imports
+
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import GridSearchCV
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.linear_model import LinearRegression
 import pickle
 import time
 with open('df.pickle', 'rb') as f:
         df = pickle.load(f)
 
+#####
+# crossVal helper method returns fit-scores for models fit on each
+# fold for cross-validation.
+#####
 def crossVal(clf, X, y, folds = 3):
-    scores = []
-    randOrd = np.random.permutation(len(y))
-    slices = list(range(0,len(y)+1, int(len(y)/folds)))
+
+    scores = [] # container to return
+    randOrd = np.random.permutation(len(y)) # permutes range of df range
+    slices = list(range(0,len(y)+1, int(len(y)/folds))) # NEED TO REFACTOR
 
     foldIndex = [randOrd[slice(slices[i],slices[i+1])] for i in range(folds) ]
 
@@ -19,8 +28,8 @@ def crossVal(clf, X, y, folds = 3):
         y_test = y.loc[tfi]
         X_test = X.loc[tfi]
 
-        notTfi = [fi for fi in foldIndex if (fi != tfi).any()]
-        train = [item for sublist in notTfi for item in sublist]
+        notTfi = [fi for fi in foldIndex if (fi != tfi).any() ] # comparing two lists
+        train = [item for sublist in notTfi for item in sublist] # unpacking indexes in the not testing groups
         y_train = y.loc[train]
         X_train = X.loc[train]
 
@@ -30,6 +39,11 @@ def crossVal(clf, X, y, folds = 3):
 
     return scores
 
+#####
+# searcher takes a dictionary of targets, features stored in X, and a dictionary
+# of parameters for DecisionTreeRegressor
+# Returns dictionary of times and scores
+#####
 def searcher(targetDict, X, paramDict):
     toRet = []
 
@@ -56,6 +70,12 @@ def searcher(targetDict, X, paramDict):
 
     return toRet
 
+#####
+# dictCompile takes in a dictionary such as would be passed to GridSearchCV
+# in the format of {'<paramname>'': [<param1>,<param1a>,...]}
+# returns dictionaries that can be passed into regressors of the format
+# {'<paramname>':<param1>, '<paramname2>':<param2}
+#####
 def dictCompile(funcDict):
     individualDicts = []
 
@@ -64,6 +84,10 @@ def dictCompile(funcDict):
 
     return dictMaker(individualDicts)
 
+#####
+# helper function to build out param dictionaries
+# recursive magic
+####
 def dictMaker(lst):
     toRet = []
     for d in lst[0]:
@@ -73,6 +97,7 @@ def dictMaker(lst):
         else:
             return lst[0]
     return toRet
+
 with open('df.pickle', 'rb') as f:
         df = pickle.load(f)
 df = df[df['SpG'] != 1]
