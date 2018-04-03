@@ -134,6 +134,17 @@ df = raw.copy()
 df['SAuthors'] = df['SAuthors'].apply(authorSplit)
 df['GAuthors'] = df['GAuthors'].apply(authorSplit)
 
+typeSpecies = pd.read_table('./typelst.txt', header = None)
+typeSpecies['Genus'] =[e[0] for e in typeSpecies[0].str.split('_')]
+typeSpecies['Species'] = [e[1] for e in typeSpecies[0].str.split('_')]
+typeSpecies = typeSpecies.drop(0, axis = 'columns')
+typeSpecies = typeSpecies.drop_duplicates()
+typeSpecies['Species'] = typeSpecies['Species'].str.replace('&#8224','')
+typeSpecies['Type'] = True
+
+df = df.merge(typeSpecies, how = 'left', on = ['Genus','Species'])
+df['Type'].fillna(False, inplace = True)
+
 import pickle
 with open('df.pickle', 'wb') as f:
     pickle.dump(df, f, protocol=0)
