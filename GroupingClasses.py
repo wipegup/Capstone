@@ -53,8 +53,8 @@ def buildTree(optionList, node):
 
     def makeEpochChildrenVals(name, val):
         toRet = []
-        for i in range(len(val)-1):
-            toRet.append((name, [val[i],val[i+1]]))
+        for tup in val:
+            toRet.append((name, tup))
         return toRet
 
     if len(optionList) > 0:

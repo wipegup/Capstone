@@ -38,6 +38,12 @@ funcDict = { 'Prop':{
                 'cmapper':LinearColorMapper}
            }
 
+
+defaultFigKW = {'plot_width': 400, 'plot_height':400,
+                'tools': "hover,save,pan,box_zoom,reset,wheel_zoom",
+                'x_axis_location' : 'above', 'toolbar_location' : None}
+
+
 def buildUnaggFigDict(x):
     toRet = {}
     for i in range(1,11):
@@ -46,11 +52,6 @@ def buildUnaggFigDict(x):
     toRet['MidSpacer'] = {'width':6*x, 'height':6*x}
     toRet['BotSpacer'] = {'width':2*x, 'height':2*x}
     return toRet
-
-defaultFigKW = {'plot_width': 400, 'plot_height':400,
-                'tools': "hover,save,pan,box_zoom,reset,wheel_zoom",
-                'x_axis_location' : 'above', 'toolbar_location' : None}
-
 
 def setPlotStyle(p):
     p.grid.grid_line_color = None
@@ -70,13 +71,23 @@ def calcColRange(df, func, center):
     maxSpread = np.max([center - realMin, realMax -center])
     return center-maxSpread , center + maxSpread
 
-def returnUnaggDisplay(tabs, func = 'Prop', figKW = defaultFigKW):
+
+def unaggDisplay(df, func, plotOpts = []):
+    plotOpts = [(e[0], None) if e[1] == 'Both' ## Check?
+                else e for e in plotOpts]
+    tabs = returnTabe(df, plotOpts)
+    title = makeTitle(plotOpts)
+    unaggFigDict = buildUnaggFigDict(45)
+
+    return returnUnaggDisplay(tabs, func, unaggFigDict)
+
+def returnUnaggDisplay(tabs, func = 'Prop', unaggFigDict):
     df = unaggStackDF(tabs)
     df['Rank'] = df['Rank'].astype(str)
     df['DateRank'] = df['DateRank'].astype(str)
     low, high = calcColRange(df,func, funcDict[func]['center'])
 
-    def unaggPlot(df, spg, func):
+    def unaggPlot(df, spg, func, unaggFigDict):
 
         colors = funcDict[func]['colors']
         mapper = funcDict[func]['cmapper'](palette = colors, low = low, high = high)
@@ -118,7 +129,28 @@ def returnUnaggDisplay(tabs, func = 'Prop', figKW = defaultFigKW):
             [plotDict[8],Spacer(**unaggFigDict['MidSpacer']), plotDict[7]],
             [plotDict[9],Spacer(**unaggFigDict['BotSpacer']), plotDict[10]]])
 
-def returnAggPlot(aggTab, func = 'Prop', start = 1, end = 10, figKW = defaultFigKW):
+
+def aggDisplay(df, func, plotOpts):
+    plotOpts = [(e[0], True) if e[1] == 'Both' ## Check?
+                else e for e in plotOpts]
+    headNode = TreeNode()
+    buildTree(plotOpts, headNode)
+
+    tables = treeTables(headNode)
+    aggPlots = []
+    for opts, tabs in tables:
+        title = makeTitle(opts)
+        aggTab = speciesRankDateAgg(tabs) # Add to ignore functionality
+        aggPlots.append(returnAggPlot(aggTab, func, title))
+
+    sqrt = len(aggPlots)**.5
+    if sqrt.is_integer(): cols = sqrt
+    else: cols = int(sqrt) +1
+
+    return gridplot(aggPlots, ncols = cols)
+
+def returnAggPlot(aggTab, func = 'Prop', title = '', start = 1, end = 10, figKW = defaultFigKW):
+    # Add title functionality
     df = aggStackDF(aggTab, start, end)
     df = addLabelToDF(df)
     df['Rank'] = df['Rank'].astype(str)
