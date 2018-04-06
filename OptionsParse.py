@@ -45,16 +45,17 @@ def alphaRank(data):
     return pd.concat(dfCollector, axis = 'rows')
 
 def replot(b):
-
+    with open('df.pickle', 'rb') as f:
+        df = pickle.load(f)
     def getData(source):
-        retFunc = {'real':lambda x:x,
+        retFunc = {'real': lambda x:x,
                     'alpha':alphaRank,
                     'rand':randomizeRank}
-        return retFunc(df)
+        return retFunc[source](df)
 
-    def getPlotOpts(typeS, OrigGenus, SpVG, epochControls):
+    def getPlotOpts(df, typeS, OrigGenus, SpVG, epochControls):
 
-        def SVGComparison(oper):
+        def SVGComparison(df, oper):
             if oper:
                 name = oper.join(['SDate ', ' GDate'])
                 compDict = {'>': op.gt,'>=': op.ge,
@@ -63,20 +64,20 @@ def replot(b):
                 df[name] = opFunc(df['SDate'], df['GDate'])
                 return df, name, True
             else:
-                return df, '', False
+                return df, '', None
 
-        df, SVGName, SVGAct = SVGComparison(SpVG)
-
-        if epochControls['OnOff']:
+        df, SVGName, SVGAct = SVGComparison(df, SpVG)
+        epochDates = []
+        if epochControls['OnOff'].value:
             epochColDict = { 's':'SDate', 'g':'GDate'}
-            epochCol = epochColDict(epochControls['Kind'])
-            epochDates = []
+            epochCol = epochColDict[epochControls['Kind'].value]
             for i in range(1,4):
                 work = epochControls[i]
                 if work['check']:
-                    epochDates.append((work['beg'],work['end']))
-            if epochDates = []:
-                epochDates = None
+                    epochDates.append((work['beg'].value,work['end'].value))
+        else:
+            epochCol = ''
+            epochDates = None
 
         optionsList = list(
                             zip([SVGName, 'Type', 'OrigG', epochCol],
@@ -86,14 +87,15 @@ def replot(b):
                         )
         return df, optionsList
 
-    df = getData(source)
-    df, plotOpts = getPlotOpts(Tspecies.value,
-                    OGenus.value, SpVG.value, epochControls.value)
+    df = getData(source.value)
 
-    func = func.value
+    df, plotOpts = getPlotOpts(df, Tspecies.value,
+                    OGenus.value, SpVG.value, epochControls)
+
+    passFunc = func.value
     if kind.value:
-        disp = aggDisplay(df, func, plotOpts)
+        disp = aggDisplay(df, passFunc, plotOpts)
     else:
-        disp = unaggDisplay(df, func, plotOpts)
-
+        disp = unaggDisplay(df, passFunc, plotOpts)
+    #clear_output()
     show(disp)

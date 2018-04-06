@@ -4,8 +4,9 @@ import operator as op
 import seaborn as sns
 
 class TreeNode(object):
-    def __init__(self, parent = 'head', value = None, name = 'head'):
+    def __init__(self, df, parent = 'head', value = None, name = 'head'):
         self.parent = parent
+        self.df = df
         self.value = value  # tuple of (name, groupbyVal)
         self.table = None
         self.children = []
@@ -25,28 +26,33 @@ class TreeNode(object):
         i = -1
         for val in childrenVals:
             i +=1
-            self.children.append(TreeNode(self, val, name = self.name + str(i)))
+            self.children.append(TreeNode(self.df, self, val, name = self.name + str(i)))
 
     def return_children(self):
         return self.children
 
     def return_val(self):
-        val = [self.value]
-        par = self.parent
-
-        while par.parent != 'head':
-            val += [par.value]
-            par = par.parent
-
-        return val
+        if self.parent == 'head':
+            return self.value
+        else:
+            val = [self.value]
+            par = self.parent
+            #print('val,par',val, par)
+            #print(par.parent)
+            while par.parent != 'head':
+                val += [par.value]
+                par = par.parent
+            return val
 
     def set_table(self):
+        #print('here')
         opts = self.return_val()
-
-        self.table = returnTable(df, opts)
+        #print('opts', opts)
+        #print(type(self.df))
+        self.table = returnTable(self.df, opts)
         self.options = opts
 
-def buildTree(optionList, node):
+def buildTree(df, optionList, node):
 
     def makeBoolChildrenVals(name, val):
         return [(name, True), (name, False)]
@@ -58,11 +64,12 @@ def buildTree(optionList, node):
         return toRet
 
     if len(optionList) > 0:
+        #print('optL',optionList)
         name, val = optionList[0]
 
         if type(val) == bool:
             node.set_children(makeBoolChildrenVals(name, val))
-        elif type(val) == list:
+        elif type(val) == tuple:
             node.set_children(makeEpochChildrenVals(name, val))
         elif type(val) == type(None):
             node.set_children([(name, None)])
@@ -70,7 +77,7 @@ def buildTree(optionList, node):
             print('Error')
 
         for child in node.return_children():
-            buildTree(optionList[1:], child)
+            buildTree(child.df, optionList[1:], child)
     else:
         node.set_table()
 

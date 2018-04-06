@@ -1,6 +1,23 @@
 from matplotlib.colors import rgb2hex
 from matplotlib.pyplot import get_cmap
-from bokeh.models import LogColorMapper, Spacer, LabelSet
+from math import pi
+import pandas as pd
+
+from bokeh.io import show
+from bokeh.models import (
+    ColumnDataSource,
+    HoverTool,
+    LinearColorMapper,
+    BasicTicker,
+    PrintfTickFormatter,
+    ColorBar,
+)
+from bokeh.palettes import brewer
+from bokeh.plotting import figure
+from bokeh.layouts import gridplot, layout
+
+from matplotlib.colors import rgb2hex
+from matplotlib.pyplot import get_cmap
 
 cw = get_cmap('coolwarm')
 cwr = get_cmap('coolwarm_r')
@@ -62,7 +79,7 @@ def setPlotStyle(p):
 
     return p
 
-def addLabelToDF(df):
+def addLabelToDF(df, func):
     df.loc[:,'labelText'] = [round(e,1) for e in df.loc[:,func]]
     return df
 
@@ -75,13 +92,13 @@ def calcColRange(df, func, center):
 def unaggDisplay(df, func, plotOpts = []):
     plotOpts = [(e[0], None) if e[1] == 'Both' ## Check?
                 else e for e in plotOpts]
-    tabs = returnTabe(df, plotOpts)
+    tabs = returnTable(df, plotOpts)
     title = makeTitle(plotOpts)
     unaggFigDict = buildUnaggFigDict(45)
 
     return returnUnaggDisplay(tabs, func, unaggFigDict)
 
-def returnUnaggDisplay(tabs, func = 'Prop', unaggFigDict):
+def returnUnaggDisplay(tabs, func = 'Prop', unaggFigDict = {}):
     df = unaggStackDF(tabs)
     df['Rank'] = df['Rank'].astype(str)
     df['DateRank'] = df['DateRank'].astype(str)
@@ -91,7 +108,7 @@ def returnUnaggDisplay(tabs, func = 'Prop', unaggFigDict):
 
         colors = funcDict[func]['colors']
         mapper = funcDict[func]['cmapper'](palette = colors, low = low, high = high)
-        df = addLabelToDF(df)
+        df = addLabelToDF(df, func)
 
         source = ColumnDataSource(df)
         x_range = [str(n) for n in range(1, spg + 1)]
@@ -123,7 +140,7 @@ def returnUnaggDisplay(tabs, func = 'Prop', unaggFigDict):
     plotDict = {}
     for spg in df['SpG'].unique():
         plotDF = df[df['SpG'] == spg]
-        plotDict[spg] = unaggPlot(plotDF, spg, func)
+        plotDict[spg] = unaggPlot(plotDF, spg, func, unaggFigDict)
 
     return layout([[plotDict[i] for i in range(1,7)],
             [plotDict[8],Spacer(**unaggFigDict['MidSpacer']), plotDict[7]],
@@ -133,9 +150,9 @@ def returnUnaggDisplay(tabs, func = 'Prop', unaggFigDict):
 def aggDisplay(df, func, plotOpts):
     plotOpts = [(e[0], True) if e[1] == 'Both' ## Check?
                 else e for e in plotOpts]
-    headNode = TreeNode()
-    buildTree(plotOpts, headNode)
-
+    headNode = TreeNode(df)
+    buildTree(df, plotOpts, headNode)
+    #return headNode ### Testing
     tables = treeTables(headNode)
     aggPlots = []
     for opts, tabs in tables:
@@ -144,7 +161,7 @@ def aggDisplay(df, func, plotOpts):
         aggPlots.append(returnAggPlot(aggTab, func, title))
 
     sqrt = len(aggPlots)**.5
-    if sqrt.is_integer(): cols = sqrt
+    if sqrt.is_integer(): cols = int(sqrt)
     else: cols = int(sqrt) +1
 
     return gridplot(aggPlots, ncols = cols)
@@ -152,7 +169,7 @@ def aggDisplay(df, func, plotOpts):
 def returnAggPlot(aggTab, func = 'Prop', title = '', start = 1, end = 10, figKW = defaultFigKW):
     # Add title functionality
     df = aggStackDF(aggTab, start, end)
-    df = addLabelToDF(df)
+    df = addLabelToDF(df, func)
     df['Rank'] = df['Rank'].astype(str)
     df['DateRank'] = df['DateRank'].astype(str)
 

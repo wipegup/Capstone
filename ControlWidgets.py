@@ -5,7 +5,7 @@ from ipywidgets import (Layout, HBox, VBox, Dropdown,RadioButtons,
                         ToggleButton, Checkbox, Label, Text, Button,
                         BoundedIntText)
 
-OGenus = RadioButtons( options = ['No Split', True, False,'Both'], description = 'In Orig. Gen.')
+OGenus = RadioButtons( options = [None, True, False,'Both'], description = 'In Orig. Gen.')
 
 def clicked(b):
     #print(b)
@@ -57,12 +57,14 @@ source = Dropdown(options = {'Real':'real','Alphabetized':'alpha','Random':'rand
                 description = 'Rankings')
 kind = Dropdown( options = {'Aggregated':True, 'Unaggregated':False}, description = 'Plot Type')
 func = Dropdown( options = {'Proportion':'Prop', 'Absolute z-score':'AbsZ', 'p-Value':'pVal', 'Count':'Count'}, description = 'Plotted')
-Tspecies = RadioButtons( options = ['No Split',True, False, 'Both'], description = 'TypeSpecies')
-replot = Button(description="Replot", layout = Layout(height = '100px'))
+Tspecies = RadioButtons( options = [None,True, False, 'Both'], description = 'TypeSpecies')
+replotButton = Button(description="Replot", layout = Layout(height = '100px'))
+
+replotButton.on_click(replot)
 SpVG = Dropdown( options = [None, '>','>=','<','<=','==','!='], description = 'vs. oper',
               layout = Layout(width = '150px'))
 svgLabel = Label('s. Description vs. G Erection Dates')
 SVGgroup = VBox([svgLabel, SpVG])
-endGroup = HBox([SVGgroup, hspace(), Tspecies, makeHspace('200px'), replot])
+endGroup = HBox([SVGgroup, hSpace, Tspecies, makeHspace('200px'), replotButton])
 sourceGroup = HBox([ source, kind, func])
-VBox([sourceGroup,vspace,epochGroup,vspace, endGroup])
+allWidgs = VBox([sourceGroup,vspace,epochGroup,vspace, endGroup])

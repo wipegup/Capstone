@@ -27,7 +27,7 @@ hMapDefaults = { 'Prop':{
 ##############DEPRECATED
 ############
 ############## DEPRECIATED
-def showPlot(data, source = 'real', kind = 'agg', num = 1, spgDiscard = [1], func = 'prop',
+def showPlot(data, source = 'real', kind = 'agg', num = 1, spgDiscard = [1], func = 'Prop',
              SDateVGDate = None, SGvsOperator = '>',
             Type = None, OrigGenus = None, Epoch = None, EpochType = 's'):
 

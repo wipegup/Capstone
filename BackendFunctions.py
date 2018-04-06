@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+
 def optionParse(options, starter, boolFunc, listFunc):
     toRet = starter
     for e in options:
@@ -9,7 +12,7 @@ def optionParse(options, starter, boolFunc, listFunc):
         elif type(val) == bool:
             toRet = boolFunc(name, val, toRet)
 
-        elif type(val) == list:
+        elif type(val) == tuple:
             toRet = listFunc(name, val, toRet)
         else:
             print('Error', type(val))
@@ -26,8 +29,10 @@ def makeTitle(options):
     def titleList(name, val, toRet):
         toRet += ' Epoch ' + str(val[0]) + ' to ' + str(val[1]) + ' '
         return toRet
-
-    return optionParse(options, '', titleBool, titleList)
+    if type(options) == type(None):
+        return 'All'
+    else:
+        return optionParse(options, '', titleBool, titleList)
 
 def returnTable(data, options = []):
     def makeMask(options):
@@ -38,8 +43,10 @@ def returnTable(data, options = []):
         def maskList(name, val, toRet):
             toRet = toRet & ((data[name] >= val[0])& (data[name] < val[1]))
             return toRet
-
-        return optionParse(options, True, maskBool, maskList)
+        if type(options) == type(None):
+            return True
+        else:
+            return optionParse(options, True, maskBool, maskList)
 
     def speciesGrouper(data):
         gbList = ['SpG','Rank', 'DateRank']
@@ -106,34 +113,3 @@ def speciesRankDateAgg(tables, toIgnore = [1]):
                     agg[dRank][rank][1] += expected
                     agg[dRank][rank][2] += drObs
     return agg
-
-def optionsParse(opts):
-    def SVGComparison(oper):
-        name = oper.join(['SDate ', ' GDate'])
-        compDict = {'>': op.gt,'>=': op.ge,
-                    '<': op.lt, '<=': op.le,'==': op.eq}
-        opFunc = compDict[oper]
-        data[name] = opFunc(data['SDate'], data['GDate'])
-        return data, name
-    SDateVGDateName = ''
-    if type(SDateVGDate) == bool:
-        data, SDateVGDateName  = SVGComparison(SGvsOperator)
-
-    if Epoch:
-        if Epoch == True:
-            Epoch = [1758, 1815, 1916, 2020]
-        if EpochType == 's':
-            epochCol = 'SDate'
-        elif EpochType == 'g':
-            epochCol = 'GDate'
-        else:
-            print('Error Epoch Splitter')
-    else:
-        epochCol = ''
-
-    optionList = list(
-                    zip(
-                        [SDateVGDateName, 'Type', 'OrigG', epochCol],
-                        [ SDateVGDate, Type, OrigGenus, Epoch]
-                        )
-                    )
