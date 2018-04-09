@@ -78,6 +78,7 @@ UAEStart = BoundedIntText( value = 1757,
                     description='Start:', **rangeTextDefaults)
 UAEEnd = BoundedIntText( value = 2020,
                     description='End:', **rangeTextDefaults)
+
 widgets.widget_link.Link((UAEStart, 'value'), (UAEEnd, 'min'))
 widgets.widget_link.Link((UAEEnd, 'value'), (UAEStart, 'max'))
 
@@ -168,6 +169,7 @@ ATspecies = RadioButtons( **aggBools,
 ######
 ### SPG toIgnore
 ######
+
 spgSelector = {}
 spgSelector['which'] = Dropdown( options = {'Only':True, 'Not':False},
                             value = False, layout = Layout(width = '150px'))
@@ -175,7 +177,7 @@ spgSelector['which'] = Dropdown( options = {'Only':True, 'Not':False},
 spgSelector['reset'] = Button(description = 'Reset')
 for i in list(range(1,11)) + [11,21,31]:
     if i < 11:
-        spgSelector[i] = Checkbox(value = False, description = str(i), layout = Layout(width = '150px'))
+        spgSelector[i] = Checkbox(value = False, description = str(i))
     else:
         spgSelector[i] = Checkbox(value = False, description = '>' + str(i-1))
 

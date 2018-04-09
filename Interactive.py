@@ -3,6 +3,7 @@ from bokeh.io import show, push_notebook
 exec(open('./BokehInteractive/BackendFunctions.py').read())
 exec(open('./BokehInteractive/GroupingFuncs.py').read())
 exec(open('./BokehInteractive/AggregationTree.py').read())
+#exec(open('.temp.py').read())
 exec(open('./BokehInteractive/BokehFuncs.py').read())
 exec(open('./BokehInteractive/ControlWidgets.py').read())
 
@@ -113,17 +114,33 @@ def replot(b):
 
     if plotType == 'agg':
         aggSubgrouping = {key:wDict[key] for key in ['start','end','toIgnore']}
+        #print('this')
         disp = aggDisplay(wDict['data'], wDict['func'], optionsList, **aggSubgrouping)
+        #print('that')
     elif plotType == 'unagg':
-        disp = unaggDisplay(wDict['data'], wDict['func'], optionsList)
 
-    handle = show(disp, notebook_handle = True)
-    push_notebook(handle = handle)
+        disp = unaggDisplay(wDict['data'], wDict['func'], optionsList)
+    #print('there')
+    clear_output()
+    show(disp)
+
+class IPlot(object):
+    def __init__(self):
+        p = figure(title = 'Press "Replot" button for selected visual')
+        p.title.text_font_size = "25px"
+        self.layout = layout(p)
+        self.handle = show(l)
+
+    def replot(self):
+        pass
 
 def Interact():
     replotButton.on_click(replot) # Replot Function from BokehReplotting.py
+    #p = figure(title = 'Press "Replot" button for selected visual')
+    #p.title.text_font_size = "25px"
+    #l = layout(p)
     display(kind)
-    handle = show(plotdd)
+    #handle = show(l)
 
 #####
 # Testing Functions

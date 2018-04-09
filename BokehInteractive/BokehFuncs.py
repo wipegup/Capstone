@@ -174,7 +174,8 @@ def unaggDisplay(df, func, plotOpts = [], figscale = 45):
     toRet = layout([
                 [plotDict[i] for i in range(1,7)],
                 [plotDict[8], unaggFigDict['MidSpacer'], plotDict[7]],
-                [plotDict[9], unaggFigDict['BotSpacer'], plotDict[10]]])
+                [plotDict[9], unaggFigDict['BotSpacer'], plotDict[10]]
+                ])
 
     return toRet
 
@@ -208,11 +209,23 @@ def aggDisplay(df, func, plotOpts = [], start = 1, end = 10, toIgnore = [1]):
         pd.concat([e[1] for e in aggPlots], axis = 'rows'),
         func, funcDict[func]['center'])
 
-    aggPlots = [aggPlot(addLabelToDF(e[1], func), func, colorRange, e[0], start, end)
-        for e in aggPlots]
+    aggPlots = [aggPlot(addLabelToDF(e[1], func),
+                    func, colorRange, e[0], start, end)
+                for e in aggPlots]
 
-    cols = len(aggPlots)**.5
+    cols = len(aggPlots) ** .5
     if cols.is_integer(): cols = int(cols)
-    else: cols = int(cols) +1
+    else: cols = int(cols) + 1
 
+    '''
+    toRet = []
+    fullRows = int(len(aggPlots)/cols)
+    for i in range(0, fullRows):
+        toRet.append(aggPlots[i*cols: (i*cols)+cols])
+    if fullRows * cols != len(aggPlots):
+        toRet.append(aggPlots[fullRows * cols :])
+    '''
+
+    #print('infu')
+    #print(type(gridplot(aggPlots, ncols = cols)))
     return gridplot(aggPlots, ncols = cols)

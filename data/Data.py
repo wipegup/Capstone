@@ -9,16 +9,21 @@ print(response.status_code)
 speciesTree = []
 for o in soup.find_all('order'):
     oname = o.find('latin_name').text
+
     for f in o.find_all('family'):
         fname = f.find('latin_name').text
+
         for g in f.find_all('genus'):
             gname = g.find('latin_name').text
             gAuthority = g.find('authority').text
             rank = 0
+            
             for s in g.find_all('species'):
                 rank +=1
                 sname = s.find('latin_name').text
-                toApp = [rank, oname, fname, gname, sname, gAuthority, s.find('authority').text, s.find('breeding_regions').text]
+                toApp = [rank, oname, fname, gname, sname, gAuthority,
+                        s.find('authority').text,
+                        s.find('breeding_regions').text]
                 speciesTree.append(toApp)
 
 #####
@@ -38,7 +43,8 @@ def cleanNames(nameCol):
     return toRet
 
 df = pd.DataFrame(speciesTree)
-df.columns = ['Rank', 'Order', 'Family','Genus','Species','GAuth','SAuth','BreedRegion']
+df.columns = ['Rank', 'Order', 'Family','Genus',
+                'Species','GAuth','SAuth','BreedRegion']
 
 df['OrigG'] = [a.count(')') == 0 for a in df['SAuth']]
 df['SAuth'] = df['SAuth'].str.replace( ')', '')
@@ -55,7 +61,9 @@ df['GAuthors'] = cleanNames(df['GAuthors'])
 df['BreedRegion'] = cleanNames(df['BreedRegion'])
 
 df = df.drop(['GAuth','SAuth'], axis = 'columns')
-df['DateRank'] = df.groupby('Genus')['SDate'].rank(ascending = True, method = 'min').astype(int)
+df['DateRank'] = df.groupby('Genus')['SDate']
+                    .rank(ascending = True, method = 'min')
+                    .astype(int)
 #df['FullName'] = df['Order'] +' '+ df['Family']+' ' + df['Genus']+'_' + df['Species'].str[:-2]
 
 spg = df.groupby('Genus')['Species'].count()
