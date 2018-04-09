@@ -36,6 +36,7 @@ def cleanNames(nameCol):
         #print(n)
         toRet.append(n)
     return toRet
+
 df = pd.DataFrame(speciesTree)
 df.columns = ['Rank', 'Order', 'Family','Genus','Species','GAuth','SAuth','BreedRegion']
 
@@ -66,6 +67,7 @@ raw.to_csv('SpGOrig.csv')
 def addToNameDict(wds,MWNameDict):
     if len(wds) == 0:
         return None
+
     else:
         if wds[0] in MWNameDict:
             toPass = MWNameDict[wds[0]]
@@ -146,5 +148,5 @@ df = df.merge(typeSpecies, how = 'left', on = ['Genus','Species'])
 df['Type'].fillna(False, inplace = True)
 
 import pickle
-with open('df.pickle', 'wb') as f:
+with open('./data/df.pickle', 'wb') as f:
     pickle.dump(df, f, protocol=0)
