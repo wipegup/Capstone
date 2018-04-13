@@ -319,7 +319,7 @@ def counts(obs, exp, n):
     return obs
 def countsApply(entry):
     return counts(*entry)
-
+'''
 hMapDefaults = { 'prop':{
                 'func' : propApply,
                 'center':1,
@@ -387,3 +387,4 @@ def unaggHeatMapper(tables, func = prop, norm = 2.6, center = (1/2.6), title = '
             rotation = 'horizontal', fontsize = 24)
     plt.text(0.003,-0.03,title +'\nProportion\n of\n species\n',
             fontsize = 30, horizontalalignment = 'center')
+'''

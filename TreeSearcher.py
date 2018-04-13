@@ -115,11 +115,9 @@ X = df[tofit]
 X['Interaction'] = X['DateRank'] * X['SpG']
 
 parameters = {
-'max_depth': range(2,41,2),
-'min_samples_split': range(2,10),
-'min_samples_leaf': range(1,5),
-'criterion': ['mse','mae','friedman_mse'],
-'splitter': ['best','random']
+'max_depth': range(10,21,2),
+'min_samples_split': range(2,5),
+'min_samples_leaf': range(1,3),
 }
 
 def doit():

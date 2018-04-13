@@ -7,7 +7,7 @@ import seaborn as sns
 hMapDefaults = { 'Prop':{
                 'func' : propApply,
                 'center':1,
-                'cmap' : 'coolwarm'},
+                'cmap' : 'coolwarm', 'norm' : 2.6},
                'AbsZ':{
                    'func' : absZScoreApply,
                    'center':1.64,
@@ -68,6 +68,7 @@ def showPlot(data, source = 'real', kind = 'agg', num = 1, spgDiscard = [1], fun
         unaggHeatMapper(tabs, title = title, **hMapDefaults[func])
 
     elif kind == 'agg':
+        plt.figure(figsize = (8,8))
         if num == 1:
             tabs = returnTable(data, optionList)
             agg = speciesRankDateAgg(tabs, spgDiscard)
@@ -96,7 +97,7 @@ def showPlot(data, source = 'real', kind = 'agg', num = 1, spgDiscard = [1], fun
         else:
             print('Error, num argument')
 
-def aggHeatMapper(agg,  title = '', func = propApply, center = 1, cmap = 'coolwarm', start = 1, end = 10):
+def aggHeatMapper(agg,  title = '', func = propApply, center = 1, cmap = 'coolwarm', start = 1, end = 10, norm = 0):
     df = pd.DataFrame(agg)
     df = df.loc[start:end, start:end]
     for c in df:
@@ -132,7 +133,7 @@ def unaggHeatMapper(tables, func = propApply, norm = 2.6, center = (1/2.6), titl
 
         where = locs[i]
         plt.subplot2grid((23,21),(where[0]-1, where[1]-1), colspan = i, rowspan = i)
-        sns.heatmap(temp, annot = annots, center = center,
+        sns.heatmap(temp, annot = annots, center = center/norm,
                     cmap = cmap, square = True, cbar = False)
 
     plt.subplot2grid((23,21),(5,8), colspan = 5, rowspan = 5)

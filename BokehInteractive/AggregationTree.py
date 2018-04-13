@@ -58,7 +58,7 @@ def buildTree(optionList, node): # Change to class method 'Grow'?$$$$
     def makeChildrenVals(name, val):
 
         def makeBoolChildrenVals(name, val):
-            return [(name, True), (name, False)]
+            return [(name, val)]
 
         def makeListChildrenVals(name, val):
             toRet = []

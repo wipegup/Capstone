@@ -56,7 +56,7 @@ funcDict = { 'Prop':{
 ######DEPRECATED?
 defaultFigKW = {'plot_width': 400, 'plot_height':400,
                 'tools': "hover",'x_axis_location' : 'above',
-                'toolbar_location' : None}
+                'toolbar_location' : None, 'logo': None}
 
 defaultToolTips = [
             ("Rank, DateRank", '@Rank , @DateRank'),
@@ -72,7 +72,7 @@ def buildUnaggFigDict(x):
     for i in range(1,11):
         toRet[i] = {'plot_width': i*x, 'plot_height': i*x,
                     'tools': 'hover', 'x_axis_location': 'above',
-                    'toolbar_location': None}
+                    'toolbar_location': None, 'logo': None}
 
     toRet['MidSpacer'] = Spacer(**{'width':6*x, 'height':6*x})
     toRet['BotSpacer'] = Spacer(**{'width':2*x, 'height':2*x})
@@ -180,7 +180,7 @@ def unaggDisplay(df, func, plotOpts = [], figscale = 45):
     return toRet
 
 def aggDisplay(df, func, plotOpts = [], start = 1, end = 10, toIgnore = [1]):
-
+    #print(plotOpts)
     def returnAggTables(df, plotOpts):
         headNode = TreeNode(df)
         buildTree(plotOpts, headNode)
